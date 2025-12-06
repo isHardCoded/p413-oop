@@ -1,77 +1,87 @@
 ﻿#include <iostream>
-#include <array>
 
 template <typename T>
-T solveLinear(T a, T b) {
-	if (a == T(0)) return -b;
-	return -b / a;
-}
 
-template <typename T>
-struct QuadraticRoots {
-	std::array<T, 2> roots;
-	int count;
+class Array {
+private:
+	T* m_data = nullptr;
+	int m_size = 0;
+	int m_count = 0;
+	int m_grow = 0;
+
+	void checkIndex(int index) const {
+		if (index < 0 || index >= m_count) {
+			std::cout << "Index out of range";
+		}
+	}
+
+public:
+	Array& operator=(const Array& other) {
+		if (this != &other) {
+			delete[] m_data;
+			m_size = other.m_size;
+			m_count = other.m_count;
+			m_grow = other.m_grow;
+			m_data = nullptr;
+
+			if (m_size > 0) {
+				m_data = new T[m_size];
+
+				for (int i = 0; i < m_count; i++) {
+					m_data[i] = other.m_data[i];
+				}
+			}
+		}
+
+		return *this;
+	}
+
+	~Array() {
+		delete[] m_data;
+	}
+	
+	int GetSize() const {
+		return m_size;
+	}
+
+	int GetUpperBound() const {
+		return (m_count > 0) ? (m_count - 1) : -1;
+	}
+
+	bool IsEmpty() const {
+		return m_count == 0;
+	}
+
+	void RemoveAll() {
+		delete[] m_data;
+		m_data = nullptr;
+		m_size = 0;
+		m_count = 0;
+	}
+
+	T* GetData() {
+		return m_data;
+	}
+
+	void SetAt(int index, const T& value) {
+		checktIndex(index);
+		m_data[index] = value;
+	}
+
+	T& GetAt(int index) {
+		checkIndex(index);
+		return m_data[index];
+	}
+
+	T& operator[] (int index) {
+		return GetAt(index);
+	}
+
+	// array[0]
 };
-
-template <typename T>
-QuadraticRoots<T> solveQuadratic(T a, T b, T c) {
-	QuadraticRoots<T> result;
-	result.roots = { T(0), T(0) };
-	result.count = 0;
-
-	if (a == T(0)) {
-		result.roots[0] = solveLinear(b, c);
-		result.count = 1;
-		return result;
-	}
-
-	T discriminant = b * b - 4 * a * c;
-
-	if (discriminant > T(0)) {
-		result.roots[0] = (-b + std::sqrt(discriminant)) / (2 * a);
-		result.roots[1] = (-b - std::sqrt(discriminant)) / (2 * a);
-		result.count = 2;
-	}
-	else if (discriminant == T(0)) {
-		result.roots[0] = -b / (2 * a);
-		result.count = 1;
-	}
-	else {
-		result.count = 0;
-	}
-
-	return result;
-}
-
-template <typename T>
-void printRoots(QuadraticRoots<T>& result) {
-	if (result.count == 0) {
-		std::cout << "Not found roots" << std::endl;
-	}
-	else if (result.count == 2) {
-		std::cout << "Two roots: "
-			<< "x1 = " << result.roots[0] << " " << "x2 = " << result.roots[1] << std::endl;
-	}
-	else {
-		std::cout << "One root: "
-			<< "x = " << result.roots[0] << std::endl;
-	}
-}
 
 int main()
 {
-	// 2x + 4 = 0
-	std::cout << "Linear: " << solveLinear(2, 4) << std::endl; // -2
-
-	// x^2 - 5x + 6 = 0
-	QuadraticRoots<int> roots = solveQuadratic(1, -5, 6);
-	printRoots(roots);
-
-	// x^2 - 2x + 1 = 0
-	QuadraticRoots<int> roots1 = solveQuadratic(1, -2, 1);
-	printRoots(roots1);
-
-	// x^2 + 1 = 0
-	QuadraticRoots<int> roots2 = solveQuadratic(1, 0, 1);
-	printRoots(roots2);
+	Array<int> arr1;
+	Array<int> arr2;
 }
